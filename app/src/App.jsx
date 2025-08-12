@@ -1,56 +1,83 @@
-import React from "react";
-import { ThemeContextProvider } from "../src/ThemeContext.jsx";
-import Nav from "../src/Layout/Navbar.jsx";
-import Footer from "../src/Layout/Footor.jsx";
-import Home from "../src/Pages/Home.jsx";
-import { CreateRouter } from "../../mjs/AppRouter.jsx";
+// src/App.js (or your main entry file)
+import React, { useState, useEffect } from "react";
+import { ThemeContextProvider } from "./ThemeContext.jsx";
+import Nav from "./Layout/Navbar.jsx";
+import Footer from "./Layout/Footor.jsx";
+import Home from "./Pages/Home.jsx";
+import Login from "./Pages/Login.jsx";
 import { Box } from "@mui/material";
 
-// Layout component that wraps the routes with Nav and Footer
 const Layout = ({ children }) => {
-  const [currentCategory, setCurrentCategory] = React.useState('images');
-  
+  const [currentCategory, setCurrentCategory] = useState("images");
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const loggedIn = sessionStorage.getItem("isLoggedIn") === "true";
+    setIsLoggedIn(loggedIn);
+  }, []);
+
+  const handleLogout = () => {
+    sessionStorage.removeItem("isLoggedIn");
+    setIsLoggedIn(false);
+  };
+
+  if (!isLoggedIn) {
+    return (
+      <ThemeContextProvider>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            minHeight: "100vh",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <Login onLogin={setIsLoggedIn} />
+          <Footer />
+        </Box>
+      </ThemeContextProvider>
+    );
+  }
+
   return (
     <ThemeContextProvider>
       <Box
         sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          minHeight: '100vh',
+          display: "flex",
+          flexDirection: "column",
+          minHeight: "100vh",
         }}
       >
-        <Nav 
-          onCategoryChange={setCurrentCategory} 
-          currentCategory={currentCategory} 
+        <Nav
+          onCategoryChange={setCurrentCategory}
+          currentCategory={currentCategory}
+          isLoggedIn={isLoggedIn}
+          onLogout={handleLogout}
         />
-        
+
         <Box
           component="main"
           sx={{
-            display: 'flex',
-            flexDirection: 'column',
+            display: "flex",
+            flexDirection: "column",
             flexGrow: 1,
-            ml: { sm: 0, md: '250px' },
+            ml: { sm: 0, md: "250px" },
           }}
         >
-          {/* Pass the currentCategory to the children if needed */}
           {React.cloneElement(children, { type: currentCategory })}
         </Box>
-        
+
         <Footer />
       </Box>
     </ThemeContextProvider>
   );
 };
 
-// Wrap your routes with the Layout component
-export default CreateRouter([
-  {
-    path: "/",
-    element: (
-      <Layout>
-        <Home />
-      </Layout>
-    ),
-  }
-]);
+export default function App() {
+  return (
+    <Layout>
+      <Home />
+    </Layout>
+  );
+}

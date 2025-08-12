@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+// src/Layout/Nav.jsx
+import React, { useState } from "react";
 import {
   AppBar,
   Toolbar,
@@ -15,24 +16,33 @@ import {
   Avatar,
   Menu,
   MenuItem,
-  Tooltip
-} from '@mui/material';
-import { useTheme } from '@mui/material/styles';
-import MenuIcon from '@mui/icons-material/Menu';
-import Brightness4Icon from '@mui/icons-material/Brightness4';
-import Brightness7Icon from '@mui/icons-material/Brightness7';
-import ImageIcon from '@mui/icons-material/Image';
-import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
-import AudiotrackIcon from '@mui/icons-material/Audiotrack';
-import DescriptionIcon from '@mui/icons-material/Description';
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import { useColorMode } from '../ThemeContext.jsx';
+  Tooltip,
+} from "@mui/material";
+import { useTheme } from "@mui/material/styles";
+import MenuIcon from "@mui/icons-material/Menu";
+import Brightness4Icon from "@mui/icons-material/Brightness4";
+import Brightness7Icon from "@mui/icons-material/Brightness7";
+import ImageIcon from "@mui/icons-material/Image";
+import VideoLibraryIcon from "@mui/icons-material/VideoLibrary";
+import AudiotrackIcon from "@mui/icons-material/Audiotrack";
+import DescriptionIcon from "@mui/icons-material/Description";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 
-const Nav = ({ onCategoryChange, currentCategory }) => {
+// Dummy hook for color mode, replace with your own context hook
+const useColorMode = () => {
+  const theme = useTheme();
+  const mode = theme.palette.mode;
+  const toggleColorMode = () => {
+    alert("Toggle theme called - implement this yourself!");
+  };
+  return { mode, toggleColorMode };
+};
+
+const Nav = ({ onCategoryChange, currentCategory, isLoggedIn, onLogout }) => {
   const theme = useTheme();
   const { mode, toggleColorMode } = useColorMode();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
 
@@ -48,13 +58,18 @@ const Nav = ({ onCategoryChange, currentCategory }) => {
     setAnchorEl(null);
   };
 
+  const handleLogoutClick = () => {
+    onLogout();
+    handleMenuClose();
+  };
+
   const menuOpen = Boolean(anchorEl);
 
   const categories = [
-    { id: 'images', label: 'Images', icon: <ImageIcon /> },
-    { id: 'videos', label: 'Videos', icon: <VideoLibraryIcon /> },
-    { id: 'audio', label: 'Audio', icon: <AudiotrackIcon /> },
-    { id: 'documents', label: 'Documents', icon: <DescriptionIcon /> },
+    { id: "images", label: "Images", icon: <ImageIcon /> },
+    { id: "videos", label: "Videos", icon: <VideoLibraryIcon /> },
+    { id: "audio", label: "Audio", icon: <AudiotrackIcon /> },
+    { id: "documents", label: "Documents", icon: <DescriptionIcon /> },
   ];
 
   const drawer = (
@@ -65,8 +80,8 @@ const Nav = ({ onCategoryChange, currentCategory }) => {
       <Divider />
       <List>
         {categories.map((category) => (
-          <ListItem 
-            button 
+          <ListItem
+            button
             key={category.id}
             selected={currentCategory === category.id}
             onClick={() => {
@@ -74,15 +89,17 @@ const Nav = ({ onCategoryChange, currentCategory }) => {
               if (isMobile) setDrawerOpen(false);
             }}
             sx={{
-              bgcolor: currentCategory === category.id ? 
-                `${theme.palette.primary.main}20` : 'transparent',
-              borderRight: currentCategory === category.id ? 
-                `3px solid ${theme.palette.primary.main}` : 'none'
+              bgcolor:
+                currentCategory === category.id
+                  ? `${theme.palette.primary.main}20`
+                  : "transparent",
+              borderRight:
+                currentCategory === category.id
+                  ? `3px solid ${theme.palette.primary.main}`
+                  : "none",
             }}
           >
-            <ListItemIcon>
-              {category.icon}
-            </ListItemIcon>
+            <ListItemIcon>{category.icon}</ListItemIcon>
             <ListItemText primary={category.label} />
           </ListItem>
         ))}
@@ -109,9 +126,9 @@ const Nav = ({ onCategoryChange, currentCategory }) => {
             Media Manager
           </Typography>
 
-          <Tooltip title={`Switch to ${mode === 'light' ? 'dark' : 'light'} mode`}>
+          <Tooltip title={`Switch to ${mode === "light" ? "dark" : "light"} mode`}>
             <IconButton onClick={toggleColorMode} color="inherit">
-              {mode === 'dark' ? <Brightness7Icon /> : <Brightness4Icon />}
+              {mode === "dark" ? <Brightness7Icon /> : <Brightness4Icon />}
             </IconButton>
           </Tooltip>
 
@@ -120,11 +137,13 @@ const Nav = ({ onCategoryChange, currentCategory }) => {
               onClick={handleMenuOpen}
               size="small"
               sx={{ ml: 2 }}
-              aria-controls={menuOpen ? 'account-menu' : undefined}
+              aria-controls={menuOpen ? "account-menu" : undefined}
               aria-haspopup="true"
-              aria-expanded={menuOpen ? 'true' : undefined}
+              aria-expanded={menuOpen ? "true" : undefined}
             >
-              <Avatar sx={{ width: 32, height: 32, bgcolor: theme.palette.secondary.main }}>
+              <Avatar
+                sx={{ width: 32, height: 32, bgcolor: theme.palette.secondary.main }}
+              >
                 <AccountCircleIcon />
               </Avatar>
             </IconButton>
@@ -137,13 +156,17 @@ const Nav = ({ onCategoryChange, currentCategory }) => {
         id="account-menu"
         open={menuOpen}
         onClose={handleMenuClose}
-        transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-        anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+        transformOrigin={{ horizontal: "right", vertical: "top" }}
+        anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
       >
         <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
         <MenuItem onClick={handleMenuClose}>My Account</MenuItem>
         <Divider />
-        <MenuItem onClick={handleMenuClose}>Logout</MenuItem>
+        {isLoggedIn ? (
+          <MenuItem onClick={handleLogoutClick}>Logout</MenuItem>
+        ) : (
+          <MenuItem onClick={handleMenuClose}>Login</MenuItem>
+        )}
       </Menu>
 
       <Drawer
@@ -151,14 +174,14 @@ const Nav = ({ onCategoryChange, currentCategory }) => {
         open={isMobile ? drawerOpen : true}
         onClose={handleDrawerToggle}
         ModalProps={{
-          keepMounted: true, // Better open performance on mobile
+          keepMounted: true,
         }}
         sx={{
-          '& .MuiDrawer-paper': { 
-            boxSizing: 'border-box',
-            width: 250
+          "& .MuiDrawer-paper": {
+            boxSizing: "border-box",
+            width: 250,
           },
-          display: { xs: 'block', md: isMobile ? 'none' : 'block' }
+          display: { xs: "block", md: isMobile ? "none" : "block" },
         }}
       >
         {drawer}
