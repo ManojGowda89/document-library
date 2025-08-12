@@ -5,7 +5,9 @@
   "scripts": {
     "dev": "cross-env NODE_ENV=development nodemon server/server.js",
     "build": "cross-env NODE_ENV=production webpack --config mjs/mjs.config.js",
-    "start": "npm run build && cross-env NODE_ENV=production node server/server.js"
+    "start": "npm run build && cross-env NODE_ENV=production node server/server.js",
+     "deploy": "docker build -t doc-manager . && docker tag doc-manager manoj20002/doc-manager:latest && docker push manoj20002/doc-manager:latest"
+
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",

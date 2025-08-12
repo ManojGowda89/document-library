@@ -37,7 +37,7 @@ import SortIcon from "@mui/icons-material/Sort";
 import WarningIcon from "@mui/icons-material/Warning";
 import axios from "axios";
 
-const API_URL = "http://localhost:3000/api"; // Update if needed
+const API_URL = "/api"; // Update if needed
 
 const acceptTypes = {
   images: "image/*",

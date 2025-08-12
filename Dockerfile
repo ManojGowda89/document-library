@@ -3,11 +3,10 @@ FROM node:20 AS builder
 WORKDIR /app
 
 COPY package*.json ./
-COPY .env .env
 
 COPY mjs ./mjs
 COPY app ./app
-COPY public ./public
+# COPY public ./public   <-- comment or remove this line if no public folder
 
 RUN npm install
 RUN npm run build
